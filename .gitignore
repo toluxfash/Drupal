@@ -1,0 +1,14 @@
+# Ansible-related
+ansible/inventory/hosts.ini  # Inventory files may contain sensitive information
+
+# Terraform-related
+terraform/.terraform/         # Terraform's hidden working directory
+terraform/terraform.tfstate   # Contains sensitive state data
+terraform/terraform.tfstate.backup  # Backup state file
+terraform/*.tfstate*          # Ignore all Terraform state files
+terraform/crash.log           # Crash logs, if any
+terraform/terraform.lock.hcl  # Lock file
+
+# General
+*.log                         # Log files
+*.bak                         # Backup files

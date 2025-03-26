@@ -1,0 +1,83 @@
+- name: Install Drupal on EC2
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Update and upgrade system packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install required PHP packages
+      apt:
+        name:
+          - php
+          - php-cli
+          - php-fpm
+          - php-json
+          - php-common
+          - php-mysql
+          - php-zip
+          - php-gd
+          - php-intl
+          - php-mbstring
+          - php-curl
+          - php-xml
+          - php-pear
+          - php-tidy
+          - php-soap
+          - php-bcmath
+          - php-xmlrpc
+        state: present
+
+    - name: Download Drupal tarball
+      get_url:
+        url: https://www.drupal.org/download-latest/tar.gz
+        dest: /tmp/drupal.tar.gz
+
+    - name: Extract Drupal
+      unarchive:
+        src: /tmp/drupal.tar.gz
+        dest: /var/www/html/
+        remote_src: yes
+        extra_opts:
+          - --strip-components=1  # This removes the top-level folder in the extracted tarball
+
+    - name: Debug extracted contents in /var/www/html/
+      command: ls -l /var/www/html/
+      register: extracted_files
+
+    - debug:
+        var: extracted_files.stdout_lines
+
+    - name: Move extracted Drupal to /var/www/html/drupal
+      command: mv /var/www/html/drupal-11.1.5 /var/www/html/drupal
+
+
+    - name: Set correct ownership and permissions
+      file:
+        path: /var/www/html/drupal
+        owner: www-data
+        group: www-data
+        mode: "0755"
+        recurse: yes
+
+    - name: Create Apache VirtualHost for Drupal
+      template:
+        src: drupal.conf.j2
+        dest: /etc/apache2/sites-available/drupal.conf
+      vars:
+        ip_address: "{{ ansible_host }}"
+
+    - name: Check Apache configuration
+      command: apachectl -t
+
+    - name: Enable Apache rewrite module
+      command: a2enmod rewrite
+
+    - name: Enable Drupal site
+      command: a2ensite drupal.conf
+
+    - name: Restart Apache
+      systemd:
+        name: apache2
+        state: restarted
