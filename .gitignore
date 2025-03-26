@@ -13,3 +13,4 @@ terraform/terraform.lock.hcl  # Lock file
 *.log                         # Log files
 *.bak                         # Backup files
 terraform/.terraform/
+terraform/.terraform/
