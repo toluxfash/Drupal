@@ -62,7 +62,7 @@ Navigate to the terraform/ directory:
 
     [webservers:vars]
     ansible_user=ubuntu
-    ansible_ssh_private_key_file=~/.ssh/toluxfash.pem
+    ansible_ssh_private_key_file=~/.ssh/your.pem
     ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 2.  Run the Ansible playbook:
